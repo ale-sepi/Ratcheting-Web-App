@@ -1,14 +1,32 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 import numpy as np
 import pandas as pd
 import streamlit as st
+import base64
+import time
 
-st.title('Ratcheting Assessment')
+st.set_page_config(
+    page_title="Ratcheting APP",
+    page_icon="⚙",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://www.extremelycoolapp.com/help',
+        'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'About': "# This is a header. This is an *extremely* cool app!"
+    }
+)
+
+#First Section
+st.title('Ratcheting Assessment 🤑')
 st.write('This application shows the N most significant changes in stress values for a particular node between two separate points in time.')
 
+#File upload up to 200mb
 uploaded_file = st.file_uploader("Choose a file")
 
-
-N = st.text_input("Enter a positive integer value for N:", value="100")
+#Inset N
+N = st.text_input("Enter a positive integer value for N:", value="10")
 
 # Validate the input
 try:
@@ -19,6 +37,10 @@ except ValueError as e:
     st.error(str(e))
     st.stop()
 
+
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
 
 def load_data(filename):
     data = pd.read_csv(filename, delimiter=',', header= None).values
@@ -83,7 +105,16 @@ hide_table_row_index = """
 st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
 if st.button('Run Analysis'):
+    start_time = time.time()
     with st.spinner('Processing...'):
         results_df = load_data(uploaded_file)
-    st.success('Analysis completed successfully.')
+    end_time = time.time()
+    st.success(f'Analysis completed successfully in {end_time - start_time:.2f} seconds.')
     st.table(results_df)
+    csv = convert_df(results_df)
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name='large_df.csv',
+        mime='text/csv',
+    )
