@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 #First Section
-st.title('Ratcheting Assessment 🤑')
+st.title('Ratcheting Assessment')
 st.write('This application shows the N most significant changes in stress values for a particular node between two separate points in time.')
 
 #File upload up to 200mb
